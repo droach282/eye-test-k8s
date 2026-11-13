@@ -1,6 +1,6 @@
 # eye-test
 
-Ranks FBS college football teams using only on-field results, with no human voting, and compares the ranking to the published polls. This repo is the Spring Boot, Angular and Kubernetes port of the Python eye-test tool; the Python tool is the source of truth for ranking behavior.
+Ranks FBS college football teams using only on-field results, with no human voting, and compares the ranking to the published polls. The purpose is to set a mechanical, codified method beside the College Football Playoff Committee's rankings. This repo is the Spring Boot, Angular and Kubernetes port of the Python eye-test tool; the Python tool is the source of truth for ranking behavior.
 
 ## Language
 
@@ -27,7 +27,7 @@ A team's schedule for a season: each game, its result, the opponent, and what th
 _Avoid_: Performance against the resume
 
 **Disqualified team**:
-A team that lost to any non-FBS opponent. It is excluded from the final ranking for the rest of the season, but its games still count as results when scoring other teams. An FBS team is expected to beat any FCS team, which is also why FCS games are not counted in win percentage.
+A team that lost to any non-FBS opponent. It is excluded from the final ranking for the rest of the season, so it has no rank in a snapshot, but its games still count as results when scoring other teams. An FBS team is expected to beat any FCS team, which is also why FCS games are not counted in win percentage.
 _Avoid_: Ineligible team, banned team
 
 ### Tiebreaking
@@ -67,11 +67,11 @@ The poll a run asks to be compared against. Defaults to the Playoff Committee Ra
 _Avoid_: Default poll
 
 **Compared poll**:
-The published poll a ranking is actually compared against; its ranks feed the poll tiebreaker and the comparison view. Normally the requested poll; the AP Top 25 when the requested poll has no rankings for the poll week; none when neither does or polls are turned off.
+The published poll a ranking is actually compared against; its ranks feed the poll tiebreaker and the comparison view. The latest Playoff Committee Rankings published this season; the latest AP Top 25 until the committee's first release; none when neither exists or polls are turned off.
 _Avoid_: Popularity contest, subjective rank
 
 **Poll week**:
-The week number a poll is published for, meaning the week whose games it precedes. Defaults to the latest week.
+The week number a poll is filed under, meaning the week whose games it precedes. A snapshot records its compared poll's week, which may differ from the snapshot's week; it is not an input.
 _Avoid_: Poll round
 
 **Power Four**:
@@ -96,10 +96,14 @@ _Avoid_: Bracket, playoff picture
 All the teams, conferences and games for one year that a run ranks.
 _Avoid_: League, dataset
 
+**Week**:
+A regular-season week of a season. A snapshot's week is the highest week with a completed game, and it counts every completed regular-season game so far. Postseason games are not part of any week.
+_Avoid_: Round
+
 **Snapshot**:
-An immutable stored ranking for a season and week, computed with a given quality weight and engine version. History is read from snapshots, never recomputed.
+An immutable stored ranking for a season and week, computed with a given quality weight. Every computation creates a new snapshot, and the latest one for a season, week and quality weight is the one shown. History is read from snapshots, never recomputed.
 _Avoid_: Ranking run, result set
 
 **Parity**:
-The Java engine returning the same order and the same exact scores as the Python tool for every season and week in the golden set, with and without a quality weight. Fixes to Python bugs wait until parity is signed off.
+The Java engine returning the same order and the same exact scores as the Python tool for every synthetic league in the golden set, with and without a quality weight. The golden set contains no real game data. Fixes to Python bugs wait until parity is signed off.
 _Avoid_: Compatibility, equivalence
