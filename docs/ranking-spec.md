@@ -235,8 +235,8 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 10 | Seeds are positions among qualifiers, not ranks | Section 9 |
 | 11 | A win over an opponent with no win percentage adds nothing to the win score. This branch should not arise from consistent data: both sides of an FBS game count the game. | Section 3 |
 | 12 | Rule 12 compares codes as plain strings, case-sensitively | Rule 12 |
-| 12 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
-| 13 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
+| 13 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
+| 14 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
 
 ## Draft fixture list for the baseline gate
 
@@ -275,5 +275,5 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F29 | A missing touchdown count | Counted as 0 in rule 10 |
 | F30 | Notre Dame ranked exactly 12, then 13 | Boundary of its own rule |
 | F31 | A conference whose short name contains "independent" | Independent detection |
-| F32 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 13 |
+| F32 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 14 |
 | F33 | `k` = 2 and a non-integer `k`; `k` below 0 or above 2 rejected | Config |
