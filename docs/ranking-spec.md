@@ -55,7 +55,7 @@ For a team with `games > 0`:
 win score = ( sum over its wins W of [ 1 + k * (win percentage of W's opponent - 1/2) ] ) / games
 ```
 
-A loss (or tie) contributes 0 to the sum. A team with `games = 0` has no win score (none).
+A loss contributes 0 to the sum. A team with `games = 0` has no win score (none).
 
 With `k = 0` every win is worth 1 and the win score is the win percentage (the **baseline**). A win over a .500 team is worth 1 at every `k`.
 
