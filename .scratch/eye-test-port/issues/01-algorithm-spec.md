@@ -1,0 +1,24 @@
+# 01: Algorithm spec from the Python tool
+
+**What to build:** A short written spec of the ranking, extracted from the Python tool's current main: win score and quality weight, FBS-only counting, disqualification, the twelve tiebreaker rules in order, the compared poll and the playoff field. Each accidental-looking behavior is recorded as ported as-is: how the head-to-head rule treats a group that is not a full round robin, how poll ranks are scored, how a missing win percentage sorts, and which rules skip or return a flat zero. The glossary gains a term for the head-to-head sweep.
+
+**Blocked by:** None (can start immediately)
+
+**Status:** ready-for-human
+
+- [ ] Spec covers every rule of the tiebreak procedure, in Python's order, with its skip conditions
+- [ ] Each accidental-looking behavior has a recorded decision
+- [ ] CONTEXT.md defines the head-to-head sweep
+- [ ] Spec is precise enough that expected results for a fixture league can be worked out by hand from it alone, with at least one worked example per tiebreaker rule
+- [ ] Fixture list for the baseline gate is drafted from the spec
+- [ ] Spec lists what the engine needs per game: week, both scores, both touchdown counts, completed; and that only completed games with both scores count
+- [ ] Spec states poll selection: the requested poll's rankings for the poll week, the AP Top 25's for that week as fallback, none if neither or polls are off
+- [ ] Spec states that a team with several non-FBS losses is reported with its worst margin
+
+## Comments
+
+**Open question (product owner):** Head-to-head sweep. Python scores a group that is not a full round robin as 0 for everyone, so the rule falls through. Intended NFL-style behavior, or an accident to log as a Python issue after parity?
+
+**Open question (product owner):** Poll scoring. Python scores a poll rank as 26 minus the rank, which assumes a Top 25. Port as-is, or record it in the spec as a known limit?
+
+**Answer (owner):** Python behavior is correct in all instances, until the owner says otherwise. The head-to-head sweep (non-round-robin groups fall through) and the 26-minus-rank poll scoring are ported as-is. The spec records Python's behavior as the decision for each quirk; it does not log them as bugs.

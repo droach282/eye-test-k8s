@@ -18,7 +18,7 @@ The port succeeds when the Java service reproduces the Python rankings exactly a
 
 **Goals**
 
-1. Behavioral parity: for every synthetic league in a golden test set, the Java engine returns the same order and the same exact scores as the Python tool.
+1. Behavioral parity: for every synthetic league in a golden test set, the Java engine returns the order and exact scores that the written algorithm spec, taken from the Python tool's logic, calls for.
 2. A web UI for viewing rankings, a team's resume, and a side-by-side comparison with the compared poll (normally the CFP committee ranking).
 3. Weekly ranking snapshots stored in a database, so history is read, not recomputed.
 4. Containerized services deployable to any conformant Kubernetes cluster with one Helm command.
@@ -59,10 +59,10 @@ P0 items are needed for parity and a usable first release. P1 adds the web-only 
 | FR-5 | Show any stored ranking as a table with team, rank, record and score, with disqualified teams listed separately along with the non-FBS loss | P0 |
 | FR-6 | Show a team resume: schedule, results, opponents and how each result contributed to the win score | P0 |
 | FR-7 | Support the quality weight `k`, from 0 to 2 and defaulting to 1; `k` is always set, `k = 0` is the baseline, and losses earn no credit at any `k` | P0 |
-| FR-8 | Compare a snapshot to the compared poll (the latest committee poll published, or the latest AP Top 25 until the committee's first release), with a rank-difference column | P1 |
+| FR-8 | Compare a snapshot to the compared poll (the requested poll for the poll week, normally the committee's, falling back to the AP Top 25 for that week), with a rank-difference column | P1 |
 | FR-9 | Removed. The public site is read-only; there is no on-demand compute from the UI or API | n/a |
 | FR-10 | Run ingest and ranking automatically each week through a CronJob: ingest, then compute a snapshot for each `k` in a chart-value list (default 0 and 1), only when a game or poll for that week changed. A newly published final committee poll triggers one last snapshot | P1 |
-| FR-11 | Provide a command-line entry point (a Spring Boot batch profile) for the weekly job, for backfilling a whole season (one snapshot per week per `k`), and for seeding the sample season | P1 |
+| FR-11 | Provide a command-line entry point (a Spring Boot batch profile) for the weekly job, for backfilling a whole season (one snapshot per week per `k`), and for seeding the sample season, with an optional requested poll and poll week | P1 |
 | FR-12 | Export a snapshot as CSV or JSON (snapshots only, never raw games or polls) | P2 |
 | FR-13 | Show the playoff field for a snapshot: 12 teams through the 2026 season and 24 from 2027, seeded by rank, with byes and the opening rounds | P1 |
 | FR-14 | Show the Python report extras for a snapshot: top 10 snubs, top 10 overrated, "Nailed It!" teams and the bottom 10 | P2 |
@@ -71,22 +71,22 @@ P0 items are needed for parity and a usable first release. P1 adds the web-only 
 
 ## Ranking engine
 
-The engine is the product's core, so it ships first and is proven against the Python tool before anything else is built on it.
+The engine is the product's core, so it ships first and is proven against the spec's hand-derived expected results before anything else is built on it.
 
 - **Pure library.** A Maven module with no Spring or database dependency. It takes teams (with abbreviation, FBS flag and conference for the season), games (with a completed flag and both touchdown counts), the compared poll's ranks, the season year and a config (including `k`), and returns an ordered ranking with per-team scoring detail.
-- **Spec before code.** Extract the algorithm from the Python source into a short written spec: how the win score is computed, how FBS-only counting and disqualification work, and the exact tiebreaker order. The Python tool is early work, so some behavior may be accidental and needs a decision, not a guess. The manual "wife choice" tiebreaker is commented out in Python and is not ported.
+- **Spec before code.** Extract the algorithm from the Python source into a short written spec: how the win score is computed, how FBS-only counting and disqualification work, and the exact tiebreaker order. The Python logic is treated as correct: its behavior, quirks included, is ported as-is unless the owner decides otherwise. The manual "wife choice" tiebreaker is commented out in Python and is not ported.
 - **Exact arithmetic.** Win percentage, win score and `k` are exact rational numbers, never floating-point, so ties are detected exactly as in Python. See [ADR 0001](./docs/adr/0001-exact-rational-scoring.md).
-- **Golden-file parity tests.** Fixtures are JSON and entirely synthetic: leagues built from the Python test scenarios and by hand, run through the Python tool to produce the expected output. They cover every tiebreaker rule, FCS-loss disqualification, an independent team and the poll fallback, each with and without `k`. No real game data is committed to the repository (see [ADR 0002](./docs/adr/0002-synthetic-data-only.md)). The Java engine must return the same order and exactly equal scores.
+- **Golden-file parity tests.** Fixtures are JSON and entirely synthetic: hand-built leagues whose expected order and exact scores are worked out by hand from the spec. The Python tool is not run to produce or check them. They cover every tiebreaker rule, FCS-loss disqualification, an independent team and the poll fallback, each with and without `k`. No real game data is committed to the repository (see [ADR 0002](./docs/adr/0002-synthetic-data-only.md)). The Java engine must return the expected order and exactly equal scores.
 - **Deterministic ties.** The same input always yields the same order. Tiebreaking is a procedure, not a sort: each of the eleven rules before the alphabetical fallback is a pure function over a tied group that returns one top team or falls through, and the procedure places one team and restarts the rest from rule 1. Unit-test each rule on its own and test the whole procedure against the golden files.
 - **Quality weight.** `k` runs from 0 to 2, defaults to 1 and is always set. `k = 0` is the baseline. Each win over an FBS opponent is worth `1 + k × (opponent win percentage − 0.5)` and each loss is worth 0. Parity tests cover runs with and without a quality weight.
 - **Playoff field.** The format comes from the season year inside the engine (12 teams through 2026, 24 from 2027), not from the config. A future format change needs an ADR.
-- **Parity first, fixes later.** If the port exposes a bug in the Python logic, record it as a separate issue and change behavior only after parity is signed off.
+- **Python logic is correct.** The Python logic is the source of truth and is ported as-is. A suspected bug is raised with the owner; behavior changes only if the owner decides so.
 
 ## Ingest and snapshots
 
 - **Regular season only.** Ingest requests regular-season games. A week is a regular-season week, and postseason games are never ranked.
 - **Games and week label.** A snapshot counts every completed game so far. Upcoming games are stored but never scored. The snapshot's week is the highest week with a completed game.
-- **Compared poll.** The latest committee poll published this season, or the latest AP Top 25 until the committee's first release. The snapshot records the poll's name and week, and the poll week may differ from the snapshot's week. Ingest asks CFBD for polls under both season types, so the committee's final ranking is found even if it is filed as postseason.
+- **Compared poll.** The requested poll's rankings for the poll week, which defaults to the snapshot's week and can be overridden on a batch run; the AP Top 25's rankings for that week if the requested poll has none; none when neither has any. This is Python's selection, except that rankings are requested under both season types so the committee's final poll is found wherever CFBD files it. The snapshot records the poll's name and week, or none.
 - **Incremental fetch.** Port Python's policy, not its storage: never refetch completed games, refetch weeks that still have an incomplete game, always refetch polls, and do a full fetch only when forced or the season changes. The normalized games in PostgreSQL are the cache, with no separate raw-response cache. Python makes about two CFBD calls per fetched week (games, and per-game team stats for touchdowns) plus about five fixed calls, so a full-season backfill is roughly 35 calls against a free-tier budget of 1,000 a month.
 - **Season and weeks.** The default season is the previous calendar year before August 1 and the current year after, as in Python. Ingest fetches weeks up to the latest started regular-season week from CFBD's calendar.
 - **Snapshot creation.** The weekly job writes a snapshot only when a game or poll for the week changed. In the offseason it logs "no change" and writes nothing. Snapshots are never updated.
@@ -150,7 +150,7 @@ The REST API is versioned under `/api/v1`, read-only, and described by an OpenAP
 | GET | `/api/v1/seasons/{year}/rankings?week=&k=` | Latest matching snapshot for a season, week and `k`, and the `k` values stored for that week |
 | GET | `/api/v1/rankings/{id}` | One snapshot with all entries |
 | GET | `/api/v1/teams/{id}/resume?season=` | A team's schedule, results and score contributions |
-| GET | `/api/v1/seasons/{year}/comparison/poll?week=` | Snapshot beside the compared poll (the latest committee poll, or the latest AP Top 25 until the committee's first release) |
+| GET | `/api/v1/seasons/{year}/comparison/poll?week=` | Snapshot beside the compared poll (the requested poll for the poll week, or the AP Top 25 for that week as the fallback) |
 | GET | `/api/v1/rankings/{id}/playoff` | The playoff field for a snapshot |
 
 Scores are returned as an exact fraction (numerator and denominator) plus a decimal rounded for display, with the same precision as the Python report. Sorting and comparison always use the exact fraction.
@@ -189,7 +189,7 @@ Requirements:
 - API client generated from the OpenAPI document in the build, never hand-written.
 - Runtime settings (API base path, build version) read from a `config.json` served beside the app, so one image works in every environment.
 - Scores shown as decimals matching the Python report's precision.
-- A footer crediting CollegeFootballData.com, and a visible "sample data" label when the season is the invented sample.
+- A footer crediting CollegeFootballData.com.
 - Responsive down to phone width, keyboard navigable, and meeting WCAG 2.1 AA contrast and labeling.
 - Loading, empty and error states on every view.
 
@@ -202,7 +202,7 @@ Two images are produced from the repo: `eye-test-api` and `eye-test-web`. Anyone
 - **Configuration.** All settings come from environment variables or mounted files, following twelve-factor practice. No secrets or environment-specific values are baked into an image.
 - **Tags.** Every image is tagged with the git commit SHA and, on release, a semantic version. `latest` is never deployed.
 - **Registry.** Images publish to GitHub Container Registry from CI.
-- **Local stack.** The compose file starts the API, web and PostgreSQL and seeds an invented sample season through the batch profile. The sample has fictional teams in two conferences plus an independent, several weeks, an FCS upset that disqualifies a team, and at least one tie that needs a deep tiebreaker. It reuses the synthetic fixtures where possible, needs no CFBD key, and is labeled "sample data" in the UI.
+- **Local stack.** The compose file starts the API, web and PostgreSQL and seeds an invented sample season through the batch profile. The sample has fictional teams in two conferences plus an independent, several weeks, an FCS upset that disqualifies a team, and at least one tie that needs a deep tiebreaker. It reuses the synthetic fixtures where possible and needs no CFBD key; the README says it runs on invented data.
 - **Hygiene.** Images are scanned in CI and the build fails on critical vulnerabilities. Multi-architecture builds (amd64 and arm64) are a P2 item.
 
 ## Kubernetes deployment
@@ -277,13 +277,13 @@ The port is done when parity holds and the deployment is repeatable. The numbers
 
 ## Risks, assumptions and open questions
 
-The biggest risk is that the Python tool's behavior is not fully written down, which makes exact parity the hardest part of the port.
+The biggest risk is that the Python tool's behavior is not fully written down, so the written spec, from which every expected result is derived, is the hardest part of the port.
 
 | Risk | Mitigation |
 | --- | --- |
-| Python logic has undocumented or accidental behavior | Write the algorithm spec first; build synthetic golden fixtures; log bugs as separate issues and fix after parity |
+| Python logic has undocumented or accidental behavior | Write the algorithm spec first; build synthetic golden fixtures from it by hand; port quirks as-is and raise any suspected bug with the owner |
 | Ordering and number-representation differences between Python and Java | Use exact rational arithmetic and explicit tie rules; compare scores for exact equality (ADR 0001) |
-| Synthetic fixtures may miss behavior that real seasons exercise | Export every Python test scenario, add hand-built leagues for each tiebreaker rule and each FCS or independent edge, and review the fixture list at the Baseline gate |
+| Synthetic fixtures may miss behavior that real seasons exercise | Hand-build leagues for each tiebreaker rule and each FCS or independent edge, and review the fixture list at the Baseline gate |
 | The CFBD API is rate-limited (free tier: 1,000 calls a month), changes its schema or restricts reuse | Fetch only new or incomplete weeks (about two calls per week); keep the ingest module behind an interface; with no official Java client, generate one from the OpenAPI spec and test the adapter against hand-written responses shaped like the API's |
 | CFBD terms bar redistributing raw data as a dataset | No real game data in the repo, derived outputs only, no bulk game or poll endpoints, the key kept server-side, and a credit in the footer (ADR 0002). Read the full current terms before deploying publicly |
 | Scope creep into new ranking ideas | Hold the non-goals; park ideas as issues |

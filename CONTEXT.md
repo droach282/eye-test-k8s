@@ -67,11 +67,11 @@ The poll a run asks to be compared against. Defaults to the Playoff Committee Ra
 _Avoid_: Default poll
 
 **Compared poll**:
-The published poll a ranking is actually compared against; its ranks feed the poll tiebreaker and the comparison view. The latest Playoff Committee Rankings published this season; the latest AP Top 25 until the committee's first release; none when neither exists or polls are turned off.
+The published poll a ranking is actually compared against; its ranks feed the poll tiebreaker and the comparison view. The requested poll's rankings for the poll week; the AP Top 25's rankings for that week if the requested poll has none; none when neither has any or polls are turned off.
 _Avoid_: Popularity contest, subjective rank
 
 **Poll week**:
-The week number a poll is filed under, meaning the week whose games it precedes. A snapshot records its compared poll's week, which may differ from the snapshot's week; it is not an input.
+The week number a poll is filed under, meaning the week whose games it precedes. A run uses its snapshot's week unless told otherwise, and a snapshot records its compared poll's week.
 _Avoid_: Poll round
 
 **Power Four**:
@@ -105,5 +105,5 @@ An immutable stored ranking for a season and week, computed with a given quality
 _Avoid_: Ranking run, result set
 
 **Parity**:
-The Java engine returning the same order and the same exact scores as the Python tool for every synthetic league in the golden set, with and without a quality weight. The golden set contains no real game data. Fixes to Python bugs wait until parity is signed off.
+The Java engine returning the order and exact scores that the written spec calls for, for every synthetic league in the golden set, with and without a quality weight. Expected results are worked out by hand from the spec; the Python tool is not run to produce or check them. The golden set contains no real game data. The Python logic is treated as correct and ported as-is.
 _Avoid_: Compatibility, equivalence
