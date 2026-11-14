@@ -167,7 +167,7 @@ The database holds these tables. Columns are the minimum the Python tool already
 | `season` | year |
 | `game` | id, season, week, home team, away team, home score, away score, home touchdowns, away touchdowns, completed |
 | `ranking_snapshot` | id, season, week, `k`, compared poll name, compared poll week, created at |
-| `ranking_entry` | snapshot id, team id, rank (null when disqualified), score, record, tiebreak note, playoff seed (null when not in the field) |
+| `ranking_entry` | snapshot id, team id, rank (null when disqualified), score, record, tiebreak note (the rule that placed the team, or none), playoff seed (null when not in the field) |
 | `ranking_entry_game` | entry id, game id, result, opponent, contribution to the win score |
 | `poll_ranking` | poll name, season, poll week, rank, team id |
 
