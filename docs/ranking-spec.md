@@ -62,7 +62,7 @@ With `k = 0` every win is worth 1 and the win score is the win percentage (the *
 
 ## 4. Initial ordering and tied groups
 
-Only FBS teams are ranked. Each FBS team's win score is computed and the teams are ordered highest first, with a team whose win score is none after all others. (Teams with equal scores keep their input order going into the tiebreak procedure. The procedure depends on that order only for teams with equal codes, rule 12.)
+Only FBS teams are ranked. Each FBS team's win score is computed and the teams are ordered highest first, with a team whose win score is none after all others. (The result does not depend on the order teams are listed in the input.)
 
 Teams are then grouped by **exactly equal win score**. Groups are processed in descending score order, and each group occupies the next block of rank positions:
 
@@ -81,7 +81,7 @@ Given a tied group, the procedure places one team at a time:
 3. Otherwise take the highest value. If **exactly one** team has it, that team is placed at the next position and removed from the group. If more than one team has it, the walk moves to the next rule.
 4. After a placement, if more than one team remains, start again at rule 1 with the remaining group. Every rule is recomputed over the smaller group. When one team remains, it is placed.
 
-Rule 12 always separates every team in a group, so the walk always ends with a placement. Teams with equal codes are ordered by their position in the group, which follows input order. The Python raises an error if all twelve rules fail to separate a group, but that guard cannot be reached.
+Rule 12 always separates every team in a group, so the walk always ends with a placement. Team codes are unique, so rule 12 always separates a group. The Python raises an error if all twelve rules fail to separate a group, but that guard cannot be reached.
 
 **Worked example (restart).** A, B and C are tied. A beat B and C, and B beat C. Rule 1 scores A = +1, B = 0, C = -1; the highest value is A's alone, so A is placed first. The group is now {B, C}. Rule 1 again: B beat C, so B = +1, C = -1, and B is placed. C is the last team and is placed.
 
@@ -172,7 +172,7 @@ If polls are off, every team scores 0 and the rule falls through. Otherwise a te
 
 ### Rule 12. Alphabetical
 
-Teams are sorted by code, ascending, by plain string comparison (so uppercase before lowercase). The first scores highest: for *n* teams the values are *n*, *n - 1*, … 1. Always separates every team: teams with equal codes keep their order in the group.
+Teams are sorted by code, ascending, by plain string comparison (so uppercase before lowercase). The first scores highest: for *n* teams the values are *n*, *n - 1*, … 1. Always separates every team, since codes are unique.
 
 **Example.** Codes `BAMA` and `AUB`: `AUB` sorts first and is placed.
 
@@ -234,9 +234,9 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 9 | Disqualified teams are ranked and tiebroken normally, then removed | Section 7 |
 | 10 | Seeds are positions among qualifiers, not ranks | Section 9 |
 | 11 | A win over an opponent with no win percentage adds nothing to the win score. This branch should not arise from consistent data: both sides of an FBS game count the game. | Section 3 |
-| 12 | Rule 12 compares codes as plain strings, case-sensitively, and orders equal codes by input order | Rule 12 |
-| 13 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
-| 14 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
+| 12 | Rule 12 compares codes as plain strings, case-sensitively | Rule 12 |
+| 12 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
+| 13 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
 
 ## Draft fixture list for the baseline gate
 
@@ -275,5 +275,5 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F29 | A missing touchdown count | Counted as 0 in rule 10 |
 | F30 | Notre Dame ranked exactly 12, then 13 | Boundary of its own rule |
 | F31 | A conference whose short name contains "independent" | Independent detection |
-| F32 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 14 |
+| F32 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 13 |
 | F33 | `k` = 2 and a non-integer `k`; `k` below 0 or above 2 rejected | Config |
