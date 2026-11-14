@@ -7,6 +7,6 @@
 **Status:** ready-for-human
 
 - [ ] Shared ranks follow 1, 2, 2, 4
-- [ ] Conference version skipped when any tied team has no conference
+- [ ] Conference version scores every team 0 when any tied team has no conference
 - [ ] Golden fixtures for both rules pass with and without k
 - [ ] Points scored and allowed count games against FBS opponents only

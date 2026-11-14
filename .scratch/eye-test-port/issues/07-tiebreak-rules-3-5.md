@@ -11,3 +11,4 @@
 - [ ] Golden fixtures for each rule pass with and without k
 - [ ] Common games are FBS opponents every team in the group has played
 - [ ] Strength of victories counts only FBS opponents beaten; strength of schedule counts every FBS opponent played
+- [ ] Rule 3 scores every team 0 when the group shares fewer than 4 opponents; a team with no beaten FBS opponents scores 0 on strength of victories, and one with no FBS games scores 0 on strength of schedule
