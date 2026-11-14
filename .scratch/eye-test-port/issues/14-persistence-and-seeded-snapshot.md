@@ -12,7 +12,7 @@
 - [ ] Sample season has fictional teams in two conferences plus an independent, an FCS upset and a deep tiebreak
 - [ ] Sample reuses the synthetic fixtures where possible and needs no CFBD key
 - [ ] Every snapshot stores its own playoff field
-- [ ] Each entry's tiebreak note names the rule that placed it: none for a team not in a tied group, and for the last team left in a group, the rule that placed the team just above it
+- [ ] Each entry's tiebreak note names the rule that placed it and the other teams still tied with it at that point; none for a team not in a tied group, including the last team left in a group, which is no longer tied with anyone
 
 ## Comments
 
