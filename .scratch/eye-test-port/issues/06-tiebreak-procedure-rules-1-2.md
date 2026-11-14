@@ -12,3 +12,7 @@
 - [ ] Golden fixtures for rules 1 and 2 pass with and without k
 - [ ] Head-to-head sweep: a team scores +1 only if it beat every other team in the group, -1 if it lost to every one, otherwise 0, including a group that is not a full round robin (ported as-is)
 - [ ] Rule 2 is skipped for the whole group when any team has no conference games; no other rule can be skipped
+
+## Comments
+
+**Decision (owner):** A rule returns its decision (the placed team, or fall through), not per-team scores. Rule 2's skip is handled inside the rule, so no score in the interface is optional. Each rule is unit tested on its own, and the rules log their per-team values for debugging.
