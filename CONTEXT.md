@@ -41,7 +41,7 @@ A tiebreaker: a tied team scores +1 if it played every other team in the tied gr
 _Avoid_: Head-to-head record
 
 **Conference record**:
-A team's win percentage counting only games against opponents in its own conference. Compared directly across conferences, since each team is measured within its own. Independents have no conference record: for a group containing one, the tiebreaker returns null and falls through. A group containing a team with no conference games yet skips the rule.
+A team's win percentage counting only games against opponents in its own conference. Compared directly across conferences, since each team is measured within its own. Independents have no conference record: for a group containing one, the tiebreaker returns null and falls through. For a group containing a team with no conference games yet, it also returns null.
 _Avoid_: League record
 
 **Common games**:

@@ -76,8 +76,8 @@ A tied group of size *n* yields *n* consecutive positions.
 Given a tied group, the procedure places one team at a time:
 
 1. Walk the twelve rules below in order, starting at rule 1.
-2. A rule produces one value per team in the group. Only rule 2 can produce null (a team with no conference games). If **any** team's value is null, the rule is **skipped for the whole group**, and the walk moves to the next rule. Every other rule scores 0 where a value cannot be computed, which falls through exactly as a skip would (see quirk 1).
-3. Otherwise take the highest value. If **exactly one** team has it, that team is placed at the next position and removed from the group. If more than one team has it, the walk moves to the next rule.
+2. A rule either places one team or returns null. It scores each team in the group and places the team with the highest value if **exactly one** team has it. It returns null if more than one team shares the highest value, or if the rule cannot apply to the group (stated under each rule).
+3. If the rule placed a team, that team takes the next position and is removed from the group. If it returned null, the walk moves to the next rule.
 4. After a placement, if more than one team remains, start again at rule 1 with the remaining group. Every rule is recomputed over the smaller group. When one team remains, it is placed.
 
 Team codes are unique, so rule 12 always separates a group and the walk always ends with a placement.
@@ -96,7 +96,7 @@ For each team T in the group, look at its games against every other team in the 
 - **-1** if T has played every other team in the group and lost every one of those games.
 - **0** otherwise, including when T has not played every other team, so a group that is not a full round robin usually scores 0 for everyone and falls through.
 
-A team that lost to every other team scores -1, but this never decides a placement, because only the highest value is used. Never skipped.
+A team that lost to every other team scores -1, but this never decides a placement, because only the highest value is used.
 
 **Example.** Group {A, B, C}: A beat B and C. A = +1 and is placed. Group {A, B, C} where A beat B, B beat C, A and C never played: A = 0 (not played C), B = 0 (lost to A, beat C), C = 0. All tie at 0, so the rule falls through.
 
@@ -104,7 +104,7 @@ A team that lost to every other team scores -1, but this never decides a placeme
 
 Each team's win percentage counting only games against opponents in the team's own real conference (an opponent counts if its conference id equals the team's). Compared directly across conferences.
 
-If any team in the group has no real conference (independent), the tiebreaker returns null and the walk falls through. If any team has no conference games (win percentage null), the rule is skipped for the whole group.
+If any team in the group has no real conference (independent), the tiebreaker returns null and the walk falls through. If any team has no conference games (win percentage null), the tiebreaker returns null and the walk falls through.
 
 **Example.** A (conference X) is 5-1 in conference games, 5/6. B (conference Y) is 6-2, 3/4. 5/6 > 3/4, so A is placed. If B were an independent, the tiebreaker returns null and the walk falls through.
 
@@ -147,7 +147,7 @@ The same, with every FBS team as the pool.
 
 ### Rule 8. Net points in conference games
 
-Each team's net points in games against same-conference FBS opponents (section 2). An independent has none and scores 0; the rule is not skipped for a group containing one.
+Each team's net points in games against same-conference FBS opponents (section 2). An independent has none and scores 0; the rule still applies to a group containing one.
 
 **Example.** A is +45, B +30. A is placed.
 
@@ -222,7 +222,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 
 | # | Behaviour | Where |
 | --- | --- | --- |
-| 1 | Rules 3, 4 and 5 and the independent case of rule 2 score 0 where Python returns null. Python skips such a rule for the whole group; with 0 for every team it ties and falls through, which gives the same result. Only rule 2's no-conference-games case keeps the skip, because 0 would let a team with a conference record beat one with null | Section 5 |
+| 1 | A rule that cannot apply to the group returns null and the walk falls through: rule 2 with an independent or a team with no conference games, rule 3 with fewer than 4 common opponents, rule 6 with a team that has no conference, rule 11 with polls off. A single team with no beaten opponents or no FBS games scores 0 on rule 4 or 5 | Section 5 |
 | 2 | A team with no wins scores 0 on strength of victories | Rule 4 |
 | 3 | Head-to-head needs a sweep of every other group member; a group that is not a full round robin scores 0 and falls through | Rule 1 |
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
@@ -248,7 +248,7 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F07 | Head-to-head sweep decides | Rule 1 |
 | F08 | Head-to-head, not a round robin | Rule 1 falls through |
 | F09 | Three-team group with restart | Section 5 |
-| F10 | Conference record decides; a team with no conference games skips the rule | Rule 2 |
+| F10 | Conference record decides; a team with no conference games makes it return null | Rule 2 |
 | F11 | Common games decide (4 or more) | Rule 3 |
 | F12 | Fewer than 4 common games | Rule 3 flat |
 | F13 | Strength of victories decides; a team with no wins | Rule 4 and its 0 |
