@@ -87,7 +87,7 @@ The American, Conference USA, MAC, Mountain West, Pac-12 and Sun Belt. Independe
 _Avoid_: Group of Five, G5, non-Power Four
 
 **Conference leader**:
-The highest-ranked team in a conference. Conferences no longer play title games, so the conference leader stands in for its champion. The Group of Six leader is the single highest-ranked team across all six Group of Six conferences.
+The highest-ranked team in a conference. As of the 2027 season, conferences will no longer play title games, so the conference leader is assumed to be its champion. This also facilitates mid-season "What if the playoffs were to start today?" brackets. The Group of Six leader is the single highest-ranked team across all six Group of Six conferences.
 _Avoid_: Conference champion
 
 **Playoff field**:
