@@ -2,13 +2,13 @@
 
 This is the written specification of the ranking, taken from the Python tool at `eye-test` commit `3cc6e98` (`main`). It is the oracle for the Java engine: expected results in the golden fixtures are worked out by hand from this document, and nothing runs the Python tool to produce or check them. The Python logic is treated as correct, so every quirk below is ported as-is unless the owner decides otherwise (see [Quirks ported as-is](#quirks-ported-as-is)).
 
-Terms are defined in [CONTEXT.md](../CONTEXT.md). All arithmetic on win percentage, win score and `k` is exact rational arithmetic ([ADR 0001](./adr/0001-exact-rational-scoring.md)); "equal" always means equal as fractions.
+Terms are defined in [CONTEXT.md](../CONTEXT.md). Where the Python returns `None`, the port returns `null`, and this document writes `null` for it. All arithmetic on win percentage, win score and `k` is exact rational arithmetic ([ADR 0001](./adr/0001-exact-rational-scoring.md)); "equal" always means equal as fractions.
 
 ## 1. Inputs
 
 **Config.** `k` (the quality weight), an exact fraction with `0 <= k <= 2`, given as a fraction or a decimal (for example `1`, `0.5` or `3/2`); the default is `1`, and a value outside the range is rejected. A run also says whether polls are on, and the season year (it selects the playoff format).
 
-**Teams.** For each team: an id, an abbreviation (the code), a school name, a conference, and whether it is FBS. A conference is either a real conference or an *independent* pseudo-conference. A conference is independent if its short name contains the text "independent" anywhere, compared case-insensitively (a substring test on the short name, not the full name). A team's conference is its **real conference** unless that conference is independent, in which case it has none.
+**Teams.** For each team: an id, an abbreviation (the code), a school name, a conference, and whether it is FBS. A conference is either a real conference or an *independent* pseudo-conference. A conference is independent if its short name contains the text "independent" anywhere, compared case-insensitively (a substring test on the short name, not the full name). A team's conference is its **real conference** unless that conference is independent, in which case its real conference is null.
 
 **Games.** For each game: a week, home and away team, home and away points, home and away touchdowns, and a completed flag. A game **counts** only if it is completed and both scores are present. Scope is games where at least one team is FBS; games between lower-division teams are not part of the data. A missing touchdown count is treated as 0. Only games up to the run's week are used, and only counting games are used anywhere below.
 
@@ -37,7 +37,7 @@ Consequences:
 
 A **win** against an opponent means `us > them` in a game against an FBS opponent. This is the only meaning of "win" below.
 
-**Win percentage** is `wins / games` as an exact fraction, or *none* if `games = 0`.
+**Win percentage** is `wins / games` as an exact fraction, or null if `games = 0`.
 
 ## 3. Win score
 
@@ -47,7 +47,7 @@ For a team with `games > 0`:
 win score = ( sum over its wins W of [ 1 + k * (win percentage of W's opponent - 1/2) ] ) / games
 ```
 
-A loss contributes 0 to the sum. A team with `games = 0` has no win score (none).
+A loss contributes 0 to the sum. A team with `games = 0` has a null win score.
 
 With `k = 0` every win is worth 1 and the win score is the win percentage (the **baseline**). A win over a .500 team is worth 1 at every `k`.
 
@@ -61,13 +61,13 @@ With `k = 0` every win is worth 1 and the win score is the win percentage (the *
 
 ## 4. Initial ordering and tied groups
 
-Only FBS teams are ranked. Each FBS team's win score is computed and the teams are ordered highest first, with a team whose win score is none after all others. (The result does not depend on the order teams are listed in the input.)
+Only FBS teams are ranked. Each FBS team's win score is computed and the teams are ordered highest first, with a team whose win score is null after all others. (The result does not depend on the order teams are listed in the input.)
 
 Teams are then grouped by **exactly equal win score**. Groups are processed in descending score order, and each group occupies the next block of rank positions:
 
 - A group of one team is placed.
 - A group of two or more teams is a **tied group** and is resolved by the tiebreak procedure (section 5). A group of two is handled exactly like a larger one.
-- All teams whose win score is none form one tied group, placed last.
+- All teams whose win score is null form one tied group, placed last.
 
 A tied group of size *n* yields *n* consecutive positions.
 
@@ -76,7 +76,7 @@ A tied group of size *n* yields *n* consecutive positions.
 Given a tied group, the procedure places one team at a time:
 
 1. Walk the twelve rules below in order, starting at rule 1.
-2. A rule produces one value per team in the group. Only rule 2 can produce none (a team with no conference games). If **any** team's value is none, the rule is **skipped for the whole group**, and the walk moves to the next rule. Every other rule scores 0 where a value cannot be computed, which falls through exactly as a skip would (see quirk 1).
+2. A rule produces one value per team in the group. Only rule 2 can produce null (a team with no conference games). If **any** team's value is null, the rule is **skipped for the whole group**, and the walk moves to the next rule. Every other rule scores 0 where a value cannot be computed, which falls through exactly as a skip would (see quirk 1).
 3. Otherwise take the highest value. If **exactly one** team has it, that team is placed at the next position and removed from the group. If more than one team has it, the walk moves to the next rule.
 4. After a placement, if more than one team remains, start again at rule 1 with the remaining group. Every rule is recomputed over the smaller group. When one team remains, it is placed.
 
@@ -104,7 +104,7 @@ A team that lost to every other team scores -1, but this never decides a placeme
 
 Each team's win percentage counting only games against opponents in the team's own real conference (an opponent counts if its conference id equals the team's). Compared directly across conferences.
 
-If any team in the group has no real conference (independent), every team scores 0, so the rule ties and falls through. If any team has no conference games (win percentage none), the rule is skipped for the whole group.
+If any team in the group has no real conference (independent), every team scores 0, so the rule ties and falls through. If any team has no conference games (win percentage null), the rule is skipped for the whole group.
 
 **Example.** A (conference X) is 5-1 in conference games, 5/6. B (conference Y) is 6-2, 3/4. 5/6 > 3/4, so A is placed. If B were an independent, every team scores 0 and the rule falls through.
 
@@ -135,7 +135,7 @@ Each team is ranked among all the teams in its own conference (all teams with th
 
 Equal values share a rank and the next rank is skipped: values 30, 25, 25, 20 rank 1, 2, 2, 4. The team's value is minus the sum of its two ranks, so the lower sum wins. This compares across conferences because each team is measured within its own.
 
-If any team in the group has no real conference, every team scores 0, so the rule ties and falls through. It is never skipped by the none-rule.
+If any team in the group has no real conference, every team scores 0, so the rule ties and falls through. It is never skipped.
 
 **Example.** A is 3rd in points scored and 5th in points allowed in its conference: sum 8, value -8. B is 2nd and 7th in its: sum 9, value -9. A is placed.
 
@@ -222,7 +222,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 
 | # | Behaviour | Where |
 | --- | --- | --- |
-| 1 | Rules 3, 4 and 5 and the independent case of rule 2 score 0 where Python returns none. Python skips such a rule for the whole group; with 0 for every team it ties and falls through, which gives the same result. Only rule 2's no-conference-games case keeps the skip, because 0 would let a team with a conference record beat one with none | Section 5 |
+| 1 | Rules 3, 4 and 5 and the independent case of rule 2 score 0 where Python returns null. Python skips such a rule for the whole group; with 0 for every team it ties and falls through, which gives the same result. Only rule 2's no-conference-games case keeps the skip, because 0 would let a team with a conference record beat one with null | Section 5 |
 | 2 | A team with no wins scores 0 on strength of victories | Rule 4 |
 | 3 | Head-to-head needs a sweep of every other group member; a group that is not a full round robin scores 0 and falls through | Rule 1 |
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
@@ -241,7 +241,7 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | --- | --- | --- |
 | F01 | Tiny league, no tied groups | Win score, FBS-only counting, ordering at both `k` |
 | F02 | League where `k` changes the order | Quality weight |
-| F03 | A team with no FBS games | None score, last tied group |
+| F03 | A team with no FBS games | Null win score, last tied group |
 | F04 | A team that lost to an FCS team | Disqualification, others' order unchanged, worst margin |
 | F05 | A disqualified team that wins a tiebreak | Section 7 |
 | F06 | An independent team in a tied group | Rule 2 flat, rule 6 flat, rule 8 scores 0 |

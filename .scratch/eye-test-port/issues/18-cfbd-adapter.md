@@ -14,7 +14,7 @@
 
 ## Comments
 
-**Decision (owner): follow Python.** The adapter asks for the requested poll's rankings for the poll week and falls back to the AP Top 25 for that week, returning none if neither has any. The earlier open question, for the record: Python asks CFBD for rankings for one poll week (default: latest started week) with no season type, and falls back to the AP Top 25 for that week if the committee has nothing. CONTEXT.md and the PRD say: latest committee poll published this season, AP until the first release, and ask under both season types. Which does the port follow? Blocks this ticket and 20.
+**Decision (owner): follow Python.** The adapter asks for the requested poll's rankings for the poll week and falls back to the AP Top 25 for that week, returning null if neither has any. The earlier open question, for the record: Python asks CFBD for rankings for one poll week (default: latest started week) with no season type, and falls back to the AP Top 25 for that week if the committee has nothing. CONTEXT.md and the PRD say: latest committee poll published this season, AP until the first release, and ask under both season types. Which does the port follow? Blocks this ticket and 20.
 
 **Decision (owner):** request rankings under both season types, so where CFBD files the final committee poll does not matter. This is the one deliberate difference from Python's call.
 

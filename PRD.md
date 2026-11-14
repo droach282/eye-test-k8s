@@ -86,7 +86,7 @@ The engine is the product's core, so it ships first and is proven against the sp
 
 - **Regular season only.** Ingest requests regular-season games. A week is a regular-season week, and postseason games are never ranked.
 - **Games and week label.** A snapshot counts every completed game so far. Upcoming games are stored but never scored. The snapshot's week is the highest week with a completed game.
-- **Compared poll.** The requested poll's rankings for the poll week, which defaults to the snapshot's week and can be overridden on a batch run; the AP Top 25's rankings for that week if the requested poll has none; none when neither has any. This is Python's selection, except that rankings are requested under both season types so the committee's final poll is found wherever CFBD files it. The snapshot records the poll's name and week, or none.
+- **Compared poll.** The requested poll's rankings for the poll week, which defaults to the snapshot's week and can be overridden on a batch run; the AP Top 25's rankings for that week if the requested poll has none; null when neither has any. This is Python's selection, except that rankings are requested under both season types so the committee's final poll is found wherever CFBD files it. The snapshot records the poll's name and week, or null.
 - **Incremental fetch.** Port Python's policy, not its storage: never refetch completed games, refetch weeks that still have an incomplete game, always refetch polls, and do a full fetch only when forced or the season changes. The normalized games in PostgreSQL are the cache, with no separate raw-response cache. Python makes about two CFBD calls per fetched week (games, and per-game team stats for touchdowns) plus about five fixed calls, so a full-season backfill is roughly 35 calls against a free-tier budget of 1,000 a month.
 - **Season and weeks.** The default season is the previous calendar year before August 1 and the current year after, as in Python. Ingest fetches weeks up to the latest started regular-season week from CFBD's calendar.
 - **Snapshot creation.** The weekly job writes a snapshot only when a game or poll for the week changed. In the offseason it logs "no change" and writes nothing. Snapshots are never updated.
@@ -167,11 +167,11 @@ The database holds these tables. Columns are the minimum the Python tool already
 | `season` | year |
 | `game` | id, season, week, home team, away team, home score, away score, home touchdowns, away touchdowns, completed |
 | `ranking_snapshot` | id, season, week, `k`, compared poll name, compared poll week, created at |
-| `ranking_entry` | snapshot id, team id, rank (null when disqualified), score, record, tiebreak note (the rule that placed the team and the teams it was tied with, or none), playoff seed (null when not in the field) |
+| `ranking_entry` | snapshot id, team id, rank (null when disqualified), score, record, tiebreak note (the rule that placed the team and the teams it was tied with, or null), playoff seed (null when not in the field) |
 | `ranking_entry_game` | entry id, game id, result, opponent, contribution to the win score |
 | `poll_ranking` | poll name, season, poll week, rank, team id |
 
-The compared poll is recorded on the snapshot as a name and week, or as none when no poll was available or polls were turned off. A disqualified team's non-FBS loss appears in its `ranking_entry_game` rows.
+The compared poll is recorded on the snapshot as a name and week, or as null when no poll was available or polls were turned off. A disqualified team's non-FBS loss appears in its `ranking_entry_game` rows.
 
 ## Angular front end
 

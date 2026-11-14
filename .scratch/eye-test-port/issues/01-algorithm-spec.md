@@ -12,7 +12,7 @@
 - [ ] Spec is precise enough that expected results for a fixture league can be worked out by hand from it alone, with at least one worked example per tiebreaker rule
 - [ ] Fixture list for the baseline gate is drafted from the spec
 - [ ] Spec lists what the engine needs per game: week, both scores, both touchdown counts, completed; and that only completed games with both scores count
-- [ ] Spec states poll selection: the requested poll's rankings for the poll week, the AP Top 25's for that week as fallback, none if neither or polls are off
+- [ ] Spec states poll selection: the requested poll's rankings for the poll week, the AP Top 25's for that week as fallback, null if neither or polls are off
 - [ ] Spec states that a team with several non-FBS losses is reported with its worst margin
 
 ## Comments
