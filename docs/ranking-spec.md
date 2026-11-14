@@ -147,7 +147,7 @@ The same, with every FBS team as the pool.
 
 ### Rule 8. Net points in conference games
 
-Each team's net points in games against same-conference FBS opponents (section 2). If any team in the group has no real conference (independent), the tiebreaker returns null and the walk falls through. The Python scores an independent 0 and still runs the rule; returning null is a deliberate change by the owner.
+Each team's net points in games against same-conference FBS opponents (section 2). If any team in the group has no real conference (independent) or has played no conference games, the tiebreaker returns null and the walk falls through. The Python scores such a team 0 and still runs the rule; returning null is a deliberate change by the owner.
 
 **Example.** A is +45, B +30. A is placed.
 
@@ -222,7 +222,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 
 | # | Behaviour | Where |
 | --- | --- | --- |
-| 1 | A rule that cannot apply to the group returns null and the walk falls through: rule 2 with an independent or a team with no conference games, rule 3 with fewer than 4 common opponents, rules 6 and 8 with a team that has no conference, rule 11 with polls off. A single team with no beaten opponents or no FBS games scores 0 on rule 4 or 5 | Section 5 |
+| 1 | A rule that cannot apply to the group returns null and the walk falls through: rule 2 with an independent or a team with no conference games, rule 3 with fewer than 4 common opponents, rule 6 with a team that has no conference, rule 8 with a team that has no conference or no conference games, rule 11 with polls off. A single team with no beaten opponents or no FBS games scores 0 on rule 4 or 5 | Section 5 |
 | 2 | A team with no wins scores 0 on strength of victories | Rule 4 |
 | 3 | Head-to-head needs a sweep of every other group member; a group that is not a full round robin scores 0 and falls through | Rule 1 |
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
@@ -255,7 +255,7 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F14 | Strength of schedule decides | Rule 5 |
 | F15 | Combined ranking in conference decides | Rule 6, shared ranks |
 | F16 | Combined ranking among FBS decides | Rule 7 |
-| F17 | Net points in conference decide | Rule 8 |
+| F17 | Net points in conference decide; a team with no conference games makes it return null | Rule 8 |
 | F18 | Net points decide | Rule 9 |
 | F19 | Net touchdowns decide | Rule 10 |
 | F20 | Poll decides; polls off; no poll | Rule 11 and the fallback |
