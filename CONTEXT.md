@@ -11,7 +11,7 @@ Wins divided by games played against FBS opponents. Games against FCS opponents 
 _Avoid_: W/L points, win-loss points
 
 **Win score**:
-The ranking's primary measure: what the initial ranking sorts by. Each win over an FBS opponent is worth `1 + k × (opponent's win percentage − 0.5)` and each loss is worth 0; the score is the total win value divided by FBS games. A win over a .500 team is always worth 1. An opponent with no win percentage (no FBS games) earns the win nothing, though the game still counts. With `k = 0` every win is worth 1 and the score is the win percentage. Compared as exact fractions, never as floating-point values.
+The ranking's primary measure: what the initial ranking sorts by. Each win over an FBS opponent is worth `1 + k × (opponent's win percentage − 0.5)` and each loss is worth 0; the score is the total win value divided by FBS games. A win over a .500 team is always worth 1. With `k = 0` every win is worth 1 and the score is the win percentage. Compared as exact fractions, never as floating-point values.
 _Avoid_: Weighted win percentage, quality points
 
 **Quality weight (`k`)**:
