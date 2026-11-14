@@ -9,4 +9,5 @@
 - [ ] Only FBS-opponent games count
 - [ ] Independents score 0 on the conference rule
 - [ ] Golden fixtures for each rule pass with and without k
-- [ ] Net points in conference games count only same-conference opponents; independents have none
+- [ ] Net points in conference games count only same-conference opponents
+- [ ] Rule 8 returns null when any tied team has no conference (a deliberate change from the Python, which scores an independent 0)

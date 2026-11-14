@@ -147,7 +147,7 @@ The same, with every FBS team as the pool.
 
 ### Rule 8. Net points in conference games
 
-Each team's net points in games against same-conference FBS opponents (section 2). An independent has none and scores 0; the rule still applies to a group containing one.
+Each team's net points in games against same-conference FBS opponents (section 2). If any team in the group has no real conference (independent), the tiebreaker returns null and the walk falls through. The Python scores an independent 0 and still runs the rule; returning null is a deliberate change by the owner.
 
 **Example.** A is +45, B +30. A is placed.
 
@@ -222,11 +222,11 @@ These look accidental or surprising; each is recorded as a decision to port the 
 
 | # | Behaviour | Where |
 | --- | --- | --- |
-| 1 | A rule that cannot apply to the group returns null and the walk falls through: rule 2 with an independent or a team with no conference games, rule 3 with fewer than 4 common opponents, rule 6 with a team that has no conference, rule 11 with polls off. A single team with no beaten opponents or no FBS games scores 0 on rule 4 or 5 | Section 5 |
+| 1 | A rule that cannot apply to the group returns null and the walk falls through: rule 2 with an independent or a team with no conference games, rule 3 with fewer than 4 common opponents, rules 6 and 8 with a team that has no conference, rule 11 with polls off. A single team with no beaten opponents or no FBS games scores 0 on rule 4 or 5 | Section 5 |
 | 2 | A team with no wins scores 0 on strength of victories | Rule 4 |
 | 3 | Head-to-head needs a sweep of every other group member; a group that is not a full round robin scores 0 and falls through | Rule 1 |
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
-| 5 | Rule 6 returns null when any team has no real conference; rule 8 scores independents 0 and still runs | Rules 6, 8 |
+| 5 | Rule 6 returns null when any team has no real conference | Rule 6 |
 | 6 | Teams with no FBS games have no win score, sort after all others and form one tied group | Section 4 |
 | 7 | Disqualified teams are ranked and tiebroken normally, then removed | Section 7 |
 | 8 | Seeds are positions among qualifiers, not ranks | Section 9 |
@@ -244,7 +244,7 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F03 | A team with no FBS games | Null win score, last tied group |
 | F04 | A team that lost to an FCS team | Disqualification, others' order unchanged, worst margin |
 | F05 | A disqualified team that wins a tiebreak | Section 7 |
-| F06 | An independent team in a tied group | Rule 2 flat, rule 6 flat, rule 8 scores 0 |
+| F06 | An independent team in a tied group | Rules 2, 6 and 8 return null |
 | F07 | Head-to-head sweep decides | Rule 1 |
 | F08 | Head-to-head, not a round robin | Rule 1 falls through |
 | F09 | Three-team group with restart | Section 5 |
