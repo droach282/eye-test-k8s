@@ -44,7 +44,7 @@ A **win** against an opponent means `us > them` in a game against an FBS opponen
 For a team with `games > 0`:
 
 ```
-win score = ( sum over its wins W of [ 1 + k * (win percentage of W's opponent - 1/2) ] ) / games
+win score = ( sum over [ 1 + k * (win percentage of the beaten opponent - 1/2) ] ) / games
 ```
 
 A loss contributes 0 to the sum. A team with `games = 0` has a null win score.
