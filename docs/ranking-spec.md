@@ -133,11 +133,11 @@ Each team is ranked among all the teams in its own conference (all teams with th
 - in points scored, highest first;
 - in points allowed, lowest first.
 
-Equal values share a rank and the next rank is skipped: values 30, 25, 25, 20 rank 1, 2, 2, 4. The team's value is minus the sum of its two ranks, so the lower sum wins. This compares across conferences because each team is measured within its own.
+Equal values share a rank and the next rank is skipped: values 30, 25, 25, 20 rank 1, 2, 2, 4. The two ranks are added together, and the lowest sum wins. (The Python stores the sum negated, so that its highest-value-wins step picks the lowest sum.) This compares across conferences because each team is measured within its own.
 
 If any team in the group has no real conference, every team scores 0, so the rule ties and falls through. It is never skipped.
 
-**Example.** A is 3rd in points scored and 5th in points allowed in its conference: sum 8, value -8. B is 2nd and 7th in its: sum 9, value -9. A is placed.
+**Example.** A is 3rd in points scored and 5th in points allowed in its conference: sum 8. B is 2nd and 7th in its: sum 9. A is placed.
 
 ### Rule 7. Combined ranking among all FBS teams
 
