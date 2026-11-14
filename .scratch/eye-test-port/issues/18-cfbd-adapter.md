@@ -10,7 +10,7 @@
 - [ ] Touchdown categories match the Python tool's definition
 - [ ] Postseason games are never stored as ranked
 - [ ] Rankings are requested with the season type set to both, so a poll filed as postseason is found
-- [ ] Poll entries are mapped to teams by team id when the response carries one, and by school name otherwise; an unmatched entry is ignored
+- [ ] Poll entries are mapped to teams by team id; an unmatched entry is ignored
 
 ## Comments
 
@@ -18,4 +18,4 @@
 
 **Decision (owner):** request rankings under both season types, so where CFBD files the final committee poll does not matter. This is the one deliberate difference from Python's call.
 
-**Decision (owner):** match poll entries to teams by id, not school name, where possible. Whether CFBD's rankings response carries a team id in the generated client is unverified (sources disagree); check the generated model before writing the mapping.
+**Decision (owner):** match poll entries to teams by id, not school name, where possible. Verified against CFBD's OpenAPI spec: `PollRank` has a required `teamId` (int32). No name fallback.

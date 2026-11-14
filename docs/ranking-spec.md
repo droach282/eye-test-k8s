@@ -12,7 +12,7 @@ Terms are defined in [CONTEXT.md](../CONTEXT.md). All arithmetic on win percenta
 
 **Games.** For each game: a week, home and away team, home and away points, home and away touchdowns, and a completed flag. A game **counts** only if it is completed and both scores are present. Scope is games where at least one team is FBS; games between lower-division teams are not part of the data. A missing touchdown count is treated as 0. Only games up to the run's week are used, and only counting games are used anywhere below.
 
-**Poll ranks.** For each team, its rank in the compared poll, or 0 if it is unranked or there is no poll. The engine takes poll ranks keyed by team id. The Python matches the poll's entries to teams by school name, because it only reads the school and rank from each entry; the port should match by team id when the poll data carries one (ticket 18), and by school name only as a fallback. An entry that matches no team is ignored, and a team with no entry is unranked, so a name mismatch silently drops a rank.
+**Poll ranks.** For each team, its rank in the compared poll, or 0 if it is unranked or there is no poll. The engine takes poll ranks keyed by team id. The Python matches the poll's entries to teams by school name; the port matches by team id, which every CFBD poll entry carries (`PollRank.teamId`, required). An entry that matches no team is ignored, and a team with no entry is unranked.
 
 ## 2. What each counting game contributes
 
