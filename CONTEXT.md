@@ -37,7 +37,7 @@ The set of teams with equal win score that the tiebreakers are trying to separat
 _Avoid_: Logjam, tie bucket
 
 **Head-to-head sweep**:
-A tiebreaker: a tied team scores +1 if it played every other team in the tied group and beat all of them, -1 if it played them all and won none of them (a loss or a tie), and 0 otherwise. A group that is not a full round robin therefore usually scores 0 for everyone and falls through. Only the highest score counts, so a -1 never decides a placement.
+A tiebreaker: a tied team scores +1 if it played every other team in the tied group and beat all of them, -1 if it played them all and lost to all of them, and 0 otherwise. A group that is not a full round robin therefore usually scores 0 for everyone and falls through. Only the highest score counts, so a -1 never decides a placement.
 _Avoid_: Head-to-head record
 
 **Conference record**:

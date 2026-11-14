@@ -32,7 +32,7 @@ For a team and a counting game against an FBS opponent, with `us` and `them` the
 
 Consequences:
 
-- Losses are `games - wins`, so a tie (equal scores) counts as a game and a non-win, shown as a loss.
+- Losses are `games - wins`. Every game is assumed to have a winner: ties do not occur in college football, and the spec defines no behavior for equal scores.
 - Two teams in the same independent pseudo-conference do not share a conference. An independent has no conference games.
 - A team whose conference did not match any known conference has conference id 0, and two such teams are treated as sharing a conference. The Python tolerates this for an FBS team, loading it and printing a warning, so it is a defensive case for bad data, not an expected one (see quirks).
 
@@ -94,10 +94,10 @@ Each rule returns a value per team; the highest value wins. "Group" is the curre
 For each team T in the group, look at its games against every other team in the group (FBS games only, all games between the pair).
 
 - **+1** if T has played every other team in the group and won every one of those games.
-- **-1** if T has played every other team in the group and won none of those games (a loss or a tie counts).
+- **-1** if T has played every other team in the group and lost every one of those games.
 - **0** otherwise, including when T has not played every other team, so a group that is not a full round robin usually scores 0 for everyone and falls through.
 
-A team that won none of its games against the others scores -1, but this never decides a placement, because only the highest value is used. Two teams that tied each other both lose the +1 and score at most 0 or -1. Never skipped.
+A team that lost to every other team scores -1, but this never decides a placement, because only the highest value is used. Never skipped.
 
 **Example.** Group {A, B, C}: A beat B and C. A = +1 and is placed. Group {A, B, C} where A beat B, B beat C, A and C never played: A = 0 (not played C), B = 0 (lost to A, beat C), C = 0. All tie at 0, so the rule falls through.
 
@@ -178,7 +178,7 @@ Teams are sorted by code, ascending, by plain string comparison (so uppercase be
 
 ## 7. Disqualification
 
-An FBS team with a loss (`us < them`) to a non-FBS opponent is **disqualified**. If it has several, the one with the worst margin (the most negative net points) is the one reported. A tie against a non-FBS opponent is not a loss.
+An FBS team with a loss (`us < them`) to a non-FBS opponent is **disqualified**. If it has several, the one with the worst margin (the most negative net points) is the one reported.
 
 Disqualification happens **after** all ranking is done. A disqualified team is ranked and tiebroken like any other (so it can win a tiebreak over a team that is not disqualified), and its games count in every other team's win score, strength and rules. It is then removed from the ordered list, so every other team keeps its relative order. It has no rank in the final ranking and is listed separately with its non-FBS loss.
 
@@ -232,13 +232,11 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 7 | Defensive: teams whose conference did not match any known conference share the conference id 0 and are treated as one conference. The Python loads such an FBS team with a warning; real data is not expected to produce one | Sections 2, 6 |
 | 8 | Teams with no FBS games have no win score, sort after all others and form one tied group | Section 4 |
 | 9 | Disqualified teams are ranked and tiebroken normally, then removed | Section 7 |
-| 10 | A tie game counts as a game and a non-win, shown as a loss | Section 2 |
-| 11 | Seeds are positions among qualifiers, not ranks | Section 9 |
-| 12 | A win over an opponent with no win percentage adds nothing to the win score. This branch should not arise from consistent data: both sides of an FBS game count the game. | Section 3 |
-| 13 | Rule 12 compares codes as plain strings, case-sensitively, and orders equal codes by input order | Rule 12 |
-| 14 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
-| 15 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
-| 16 | A tie counts toward a -1 sweep score (the team won none of its games) | Rule 1 |
+| 10 | Seeds are positions among qualifiers, not ranks | Section 9 |
+| 11 | A win over an opponent with no win percentage adds nothing to the win score. This branch should not arise from consistent data: both sides of an FBS game count the game. | Section 3 |
+| 12 | Rule 12 compares codes as plain strings, case-sensitively, and orders equal codes by input order | Rule 12 |
+| 13 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
+| 14 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
 
 ## Draft fixture list for the baseline gate
 
@@ -246,39 +244,36 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 
 | # | League | What it covers |
 | --- | --- | --- |
-| F01 | Tiny league, no ties | Win score, FBS-only counting, ordering at both `k` |
+| F01 | Tiny league, no tied groups | Win score, FBS-only counting, ordering at both `k` |
 | F02 | League where `k` changes the order | Quality weight |
 | F03 | A team with no FBS games | None score, last tied group |
-| F04 | A tie game | Game and non-win, record |
-| F05 | A team that lost to an FCS team | Disqualification, others' order unchanged, worst margin |
-| F06 | A disqualified team that wins a tiebreak | Section 7 |
-| F07 | An independent team in a tied group | Rule 2 skipped, rule 6 flat, rule 8 scores 0 |
-| F08 | Head-to-head sweep decides | Rule 1 |
-| F09 | Head-to-head, not a round robin | Rule 1 falls through |
-| F10 | Three-team group with restart | Section 5 |
-| F11 | Conference record decides | Rule 2 |
-| F12 | Common games decide (4 or more) | Rule 3 |
-| F13 | Fewer than 4 common games | Rule 3 skipped |
-| F14 | Strength of victories decides; a team with no wins | Rule 4 and its skip |
-| F15 | Strength of schedule decides | Rule 5 |
-| F16 | Combined ranking in conference decides | Rule 6, shared ranks |
-| F17 | Combined ranking among FBS decides | Rule 7 |
-| F18 | Net points in conference decide | Rule 8 |
-| F19 | Net points decide | Rule 9 |
-| F20 | Net touchdowns decide | Rule 10 |
-| F21 | Poll decides; polls off; no poll | Rule 11 and the fallback |
-| F22 | Alphabetical decides | Rule 12 |
-| F23 | 12-team field with Notre Dame in, then out | Section 9 |
-| F24 | 12-team field with a Power Four leader outside the cut | Seeds as positions |
-| F25 | 24-team field with a Group of Six leader | Section 9 |
-| F26 | Short field | No bracket |
-| F27 | Unmatched conference id (defensive, optional) | Quirk 7 |
-| F28 | Two teams that played twice (a rematch) | Rules 1, 3, 4, 5 count both games |
-| F29 | A tie game inside a sweep group | Rule 1, quirk 16 |
-| F30 | A game not completed, a game with no score, and a game with an unknown team | Skipped games |
-| F31 | A missing touchdown count | Counted as 0 in rule 10 |
-| F32 | Notre Dame ranked exactly 12, then 13 | Boundary of its own rule |
-| F33 | A Power Four leader ranked below the cut | Seeds as positions |
-| F34 | A conference whose short name contains "independent" | Independent detection |
-| F35 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 15 |
-| F36 | `k` = 2 and a non-integer `k`; `k` below 0 or above 2 rejected | Config |
+| F04 | A team that lost to an FCS team | Disqualification, others' order unchanged, worst margin |
+| F05 | A disqualified team that wins a tiebreak | Section 7 |
+| F06 | An independent team in a tied group | Rule 2 skipped, rule 6 flat, rule 8 scores 0 |
+| F07 | Head-to-head sweep decides | Rule 1 |
+| F08 | Head-to-head, not a round robin | Rule 1 falls through |
+| F09 | Three-team group with restart | Section 5 |
+| F10 | Conference record decides | Rule 2 |
+| F11 | Common games decide (4 or more) | Rule 3 |
+| F12 | Fewer than 4 common games | Rule 3 skipped |
+| F13 | Strength of victories decides; a team with no wins | Rule 4 and its skip |
+| F14 | Strength of schedule decides | Rule 5 |
+| F15 | Combined ranking in conference decides | Rule 6, shared ranks |
+| F16 | Combined ranking among FBS decides | Rule 7 |
+| F17 | Net points in conference decide | Rule 8 |
+| F18 | Net points decide | Rule 9 |
+| F19 | Net touchdowns decide | Rule 10 |
+| F20 | Poll decides; polls off; no poll | Rule 11 and the fallback |
+| F21 | Alphabetical decides | Rule 12 |
+| F22 | 12-team field with Notre Dame in, then out | Section 9 |
+| F23 | 12-team field with a Power Four leader outside the cut | Seeds as positions |
+| F24 | 24-team field with a Group of Six leader | Section 9 |
+| F25 | Short field | No bracket |
+| F26 | Unmatched conference id (defensive, optional) | Quirk 7 |
+| F27 | Two teams that played twice (a rematch) | Rules 1, 3, 4, 5 count both games |
+| F28 | A game not completed, a game with no score, and a game with an unknown team | Skipped games |
+| F29 | A missing touchdown count | Counted as 0 in rule 10 |
+| F30 | Notre Dame ranked exactly 12, then 13 | Boundary of its own rule |
+| F31 | A conference whose short name contains "independent" | Independent detection |
+| F32 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 14 |
+| F33 | `k` = 2 and a non-integer `k`; `k` below 0 or above 2 rejected | Config |
