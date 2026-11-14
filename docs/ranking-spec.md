@@ -34,7 +34,7 @@ Consequences:
 
 - Losses are `games - wins`, so a tie (equal scores) counts as a game and a non-win, shown as a loss.
 - Two teams in the same independent pseudo-conference do not share a conference. An independent has no conference games.
-- Two teams with the unmatched conference id 0 are treated as sharing a conference (see quirks).
+- A team whose conference did not match any known conference has conference id 0, and two such teams are treated as sharing a conference. The Python tolerates this for an FBS team, loading it and printing a warning, so it is a defensive case for bad data, not an expected one (see quirks).
 
 A **win** against an opponent means `us > them` in a game against an FBS opponent. This is the only meaning of "win" below.
 
@@ -197,7 +197,7 @@ Qualification, walking the ranking in order:
 1. **Power Four leader.** The first team seen from each Power Four conference qualifies.
 2. **24-team only, Group of Six leader.** The first team from any Group of Six conference qualifies.
 3. **12-team only, Notre Dame.** If Notre Dame is ranked in the top 12, it qualifies by its own rule.
-4. **12-team only, highest non-Power Four.** The first team not in a Power Four conference qualifies, skipping Notre Dame if it qualified by its own rule. It may be a Group of Six team, an independent, a team whose conference did not match any known conference (its conference code is empty, so it is in neither group), or Notre Dame when Notre Dame is ranked below 12.
+4. **12-team only, highest non-Power Four.** The first team not in a Power Four conference qualifies, skipping Notre Dame if it qualified by its own rule. It may be a Group of Six team, an independent, a team whose conference did not match any known conference (a data anomaly that the Python tolerates; its conference code is empty, so it is in neither group), or Notre Dame when Notre Dame is ranked below 12.
 5. **At-large.** Teams in rank order that have not qualified are added until the field has the format's size.
 
 A team that qualifies by more than one rule is listed once, under the first rule that matched. The field is listed in rank order, and **seeds are positions in that list**, 1 to the field's size. A team outside the top of the ranking that qualified by a rule therefore takes the seed after the qualifiers ranked above it, which can be a lower number than its rank.
@@ -229,7 +229,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
 | 5 | A poll rank scores `26 - rank`, which assumes a Top 25 | Rule 11 |
 | 6 | Rule 6 scores 0 for everyone when any team has no real conference; rule 8 scores independents 0 and still runs | Rules 6, 8 |
-| 7 | Teams whose conference did not match any known conference share the conference id 0 and are treated as one conference | Sections 2, 6 |
+| 7 | Defensive: teams whose conference did not match any known conference share the conference id 0 and are treated as one conference. The Python loads such an FBS team with a warning; real data is not expected to produce one | Sections 2, 6 |
 | 8 | Teams with no FBS games have no win score, sort after all others and form one tied group | Section 4 |
 | 9 | Disqualified teams are ranked and tiebroken normally, then removed | Section 7 |
 | 10 | A tie game counts as a game and a non-win, shown as a loss | Section 2 |
@@ -237,7 +237,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 12 | A win over an opponent with no win percentage adds nothing to the win score. This branch should not arise from consistent data: both sides of an FBS game count the game. | Section 3 |
 | 13 | Rule 12 compares codes as plain strings, case-sensitively, and orders equal codes by input order | Rule 12 |
 | 14 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
-| 15 | A team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
+| 15 | Defensive: a team with an unmatched conference has an empty conference code in the playoff field, so it is in neither the Power Four nor the Group of Six | Section 9 |
 | 16 | A tie counts toward a -1 sweep score (the team won none of its games) | Rule 1 |
 
 ## Draft fixture list for the baseline gate
@@ -272,7 +272,7 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F24 | 12-team field with a Power Four leader outside the cut | Seeds as positions |
 | F25 | 24-team field with a Group of Six leader | Section 9 |
 | F26 | Short field | No bracket |
-| F27 | Unmatched conference id | Quirk 7 |
+| F27 | Unmatched conference id (defensive, optional) | Quirk 7 |
 | F28 | Two teams that played twice (a rematch) | Rules 1, 3, 4, 5 count both games |
 | F29 | A tie game inside a sweep group | Rule 1, quirk 16 |
 | F30 | A game not completed, a game with no score, and a game with an unknown team | Skipped games |
@@ -280,5 +280,5 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F32 | Notre Dame ranked exactly 12, then 13 | Boundary of its own rule |
 | F33 | A Power Four leader ranked below the cut | Seeds as positions |
 | F34 | A conference whose short name contains "independent" | Independent detection |
-| F35 | An unmatched-conference team in the playoff field | Quirk 15 |
+| F35 | An unmatched-conference team in the playoff field (defensive, optional) | Quirk 15 |
 | F36 | `k` = 2 and a non-integer `k`; `k` below 0 or above 2 rejected | Config |
