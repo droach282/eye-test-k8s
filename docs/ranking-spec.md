@@ -104,15 +104,15 @@ A team that lost to every other team scores -1, but this never decides a placeme
 
 Each team's win percentage counting only games against opponents in the team's own real conference (an opponent counts if its conference id equals the team's). Compared directly across conferences.
 
-If any team in the group has no real conference (independent), every team scores 0, so the rule ties and falls through. If any team has no conference games (win percentage null), the rule is skipped for the whole group.
+If any team in the group has no real conference (independent), the tiebreaker returns null and the walk falls through. If any team has no conference games (win percentage null), the rule is skipped for the whole group.
 
-**Example.** A (conference X) is 5-1 in conference games, 5/6. B (conference Y) is 6-2, 3/4. 5/6 > 3/4, so A is placed. If B were an independent, every team scores 0 and the rule falls through.
+**Example.** A (conference X) is 5-1 in conference games, 5/6. B (conference Y) is 6-2, 3/4. 5/6 > 3/4, so A is placed. If B were an independent, the tiebreaker returns null and the walk falls through.
 
 ### Rule 3. Common games
 
-An **opponent in common** is an FBS opponent that every team in the group has played. If the group has fewer than **4** opponents in common, every team scores 0 and the rule falls through. Otherwise each team's value is its win percentage in all its games against those opponents.
+An **opponent in common** is an FBS opponent that every team in the group has played. If the group has fewer than **4** opponents in common, the tiebreaker returns null and the walk falls through. Otherwise each team's value is its win percentage in all its games against those opponents.
 
-**Example.** A and B share opponents P, Q, R, S. A beat P, Q, R and lost to S: 3/4. B beat P, Q and lost to R, S: 2/4. A is placed. With only three opponents in common every team scores 0 and the rule falls through.
+**Example.** A and B share opponents P, Q, R, S. A beat P, Q, R and lost to S: 3/4. B beat P, Q and lost to R, S: 2/4. A is placed. With only three opponents in common the tiebreaker returns null and the walk falls through.
 
 ### Rule 4. Strength of victories
 
@@ -135,7 +135,7 @@ Each team is ranked among all the teams in its own conference (all teams with th
 
 Equal values share a rank and the next rank is skipped: values 30, 25, 25, 20 rank 1, 2, 2, 4. The two ranks are added together, and the lowest sum wins. This compares across conferences because each team is measured within its own.
 
-If any team in the group has no real conference, every team scores 0, so the rule ties and falls through. It is never skipped.
+If any team in the group has no real conference, the tiebreaker returns null and the walk falls through.
 
 **Example.** A is 3rd in points scored and 5th in points allowed in its conference: sum 8. B is 2nd and 7th in its: sum 9. A is placed.
 
@@ -165,7 +165,7 @@ Each team's touchdowns scored minus touchdowns allowed in FBS games. A team's to
 
 ### Rule 11. Poll ranking
 
-If polls are off, every team scores 0 and the rule falls through. Otherwise a team ranked `r` in the compared poll scores `26 - r`, and an unranked team scores 0.
+If polls are off, the tiebreaker returns null and the walk falls through. Otherwise a team ranked `r` in the compared poll scores `26 - r`, and an unranked team scores 0.
 
 **Example.** A is ranked 12 (14), B ranked 20 (6), C unranked (0). A is placed.
 
@@ -226,7 +226,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 2 | A team with no wins scores 0 on strength of victories | Rule 4 |
 | 3 | Head-to-head needs a sweep of every other group member; a group that is not a full round robin scores 0 and falls through | Rule 1 |
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
-| 5 | Rule 6 scores 0 for everyone when any team has no real conference; rule 8 scores independents 0 and still runs | Rules 6, 8 |
+| 5 | Rule 6 returns null when any team has no real conference; rule 8 scores independents 0 and still runs | Rules 6, 8 |
 | 6 | Teams with no FBS games have no win score, sort after all others and form one tied group | Section 4 |
 | 7 | Disqualified teams are ranked and tiebroken normally, then removed | Section 7 |
 | 8 | Seeds are positions among qualifiers, not ranks | Section 9 |
