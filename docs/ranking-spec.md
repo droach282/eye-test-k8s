@@ -76,7 +76,7 @@ A tied group of size *n* yields *n* consecutive positions.
 Given a tied group, the procedure places one team at a time:
 
 1. Walk the twelve rules below in order, starting at rule 1.
-2. A rule produces one value per team in the group. If **any** team's value is none, the rule is **skipped for the whole group**, and the walk moves to the next rule.
+2. A rule produces one value per team in the group. Only rule 2 can produce none (a team with no conference games). If **any** team's value is none, the rule is **skipped for the whole group**, and the walk moves to the next rule. Every other rule scores 0 where a value cannot be computed, which falls through exactly as a skip would (see quirk 1).
 3. Otherwise take the highest value. If **exactly one** team has it, that team is placed at the next position and removed from the group. If more than one team has it, the walk moves to the next rule.
 4. After a placement, if more than one team remains, start again at rule 1 with the remaining group. Every rule is recomputed over the smaller group. When one team remains, it is placed.
 
@@ -104,25 +104,25 @@ A team that lost to every other team scores -1, but this never decides a placeme
 
 Each team's win percentage counting only games against opponents in the team's own real conference (an opponent counts if its conference id equals the team's). Compared directly across conferences.
 
-Skipped for the whole group if any team in it has no real conference (independent), or if any team has no conference games (win percentage none).
+If any team in the group has no real conference (independent), every team scores 0, so the rule ties and falls through. If any team has no conference games (win percentage none), the rule is skipped for the whole group.
 
-**Example.** A (conference X) is 5-1 in conference games, 5/6. B (conference Y) is 6-2, 3/4. 5/6 > 3/4, so A is placed. If B were an independent, the rule is skipped.
+**Example.** A (conference X) is 5-1 in conference games, 5/6. B (conference Y) is 6-2, 3/4. 5/6 > 3/4, so A is placed. If B were an independent, every team scores 0 and the rule falls through.
 
 ### Rule 3. Common games
 
-An **opponent in common** is an FBS opponent that every team in the group has played. If the group has fewer than **4** opponents in common, the rule is skipped. Otherwise each team's value is its win percentage in all its games against those opponents.
+An **opponent in common** is an FBS opponent that every team in the group has played. If the group has fewer than **4** opponents in common, every team scores 0 and the rule falls through. Otherwise each team's value is its win percentage in all its games against those opponents.
 
-**Example.** A and B share opponents P, Q, R, S. A beat P, Q, R and lost to S: 3/4. B beat P, Q and lost to R, S: 2/4. A is placed. With only three opponents in common the rule is skipped.
+**Example.** A and B share opponents P, Q, R, S. A beat P, Q, R and lost to S: 3/4. B beat P, Q and lost to R, S: 2/4. A is placed. With only three opponents in common every team scores 0 and the rule falls through.
 
 ### Rule 4. Strength of victories
 
-For each team, take the FBS opponents it beat and divide the opponents' total wins by their total games: combined wins over combined games, not an average of percentages. The value is none, and so the rule is skipped for the whole group, if the team has no beaten FBS opponents with games (a team with no wins, for instance).
+For each team, take the FBS opponents it beat and divide the opponents' total wins by their total games: combined wins over combined games, not an average of percentages. The value is 0 if the team has no beaten FBS opponents with games (a team with no wins, for instance).
 
 **Example.** A beat opponents with a combined 20 wins in 30 games: 2/3. B beat opponents with a combined 18 wins in 30 games: 3/5. A is placed.
 
 ### Rule 5. Strength of schedule
 
-For each team, take every FBS opponent it played and divide their total wins by their total games. Opponents that are not FBS contribute nothing. None, and so skipped for the whole group, if there are no such games.
+For each team, take every FBS opponent it played and divide their total wins by their total games. Opponents that are not FBS contribute nothing. The value is 0 if there are no such games.
 
 **Example.** A's opponents combine for 61 wins in 120 games, B's for 59 in 120. 61/120 > 59/120, so A is placed.
 
@@ -222,8 +222,8 @@ These look accidental or surprising; each is recorded as a decision to port the 
 
 | # | Behaviour | Where |
 | --- | --- | --- |
-| 1 | A rule that returns none for any one team is skipped for the whole group | Section 5 |
-| 2 | A team with no wins has no strength of victories, which skips rule 4 for any group containing it | Rule 4 |
+| 1 | Rules 3, 4 and 5 and the independent case of rule 2 score 0 where Python returns none. Python skips such a rule for the whole group; with 0 for every team it ties and falls through, which gives the same result. Only rule 2's no-conference-games case keeps the skip, because 0 would let a team with a conference record beat one with none | Section 5 |
+| 2 | A team with no wins scores 0 on strength of victories | Rule 4 |
 | 3 | Head-to-head needs a sweep of every other group member; a group that is not a full round robin scores 0 and falls through | Rule 1 |
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
 | 5 | Rule 6 scores 0 for everyone when any team has no real conference; rule 8 scores independents 0 and still runs | Rules 6, 8 |
@@ -244,14 +244,14 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F03 | A team with no FBS games | None score, last tied group |
 | F04 | A team that lost to an FCS team | Disqualification, others' order unchanged, worst margin |
 | F05 | A disqualified team that wins a tiebreak | Section 7 |
-| F06 | An independent team in a tied group | Rule 2 skipped, rule 6 flat, rule 8 scores 0 |
+| F06 | An independent team in a tied group | Rule 2 flat, rule 6 flat, rule 8 scores 0 |
 | F07 | Head-to-head sweep decides | Rule 1 |
 | F08 | Head-to-head, not a round robin | Rule 1 falls through |
 | F09 | Three-team group with restart | Section 5 |
-| F10 | Conference record decides | Rule 2 |
+| F10 | Conference record decides; a team with no conference games skips the rule | Rule 2 |
 | F11 | Common games decide (4 or more) | Rule 3 |
-| F12 | Fewer than 4 common games | Rule 3 skipped |
-| F13 | Strength of victories decides; a team with no wins | Rule 4 and its skip |
+| F12 | Fewer than 4 common games | Rule 3 flat |
+| F13 | Strength of victories decides; a team with no wins | Rule 4 and its 0 |
 | F14 | Strength of schedule decides | Rule 5 |
 | F15 | Combined ranking in conference decides | Rule 6, shared ranks |
 | F16 | Combined ranking among FBS decides | Rule 7 |

@@ -4,6 +4,8 @@ All code in this repository is written by the human owner. No AI wrote it, and A
 
 Agents working here must not write, edit, or generate code, and must not spawn subagents or other sessions to do so. Limit yourself to discussion, explanation, and review. If a code change seems needed, describe it and leave the edit to the owner.
 
+"Brevity is the soul of Wit." - _Hamlet_, William Shakespeare.  Avoid verbose explanations or questions unless elaboration is requested by the user.  Present questions one at a time.
+
 ## Agent skills
 
 ### Issue tracker

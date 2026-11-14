@@ -41,7 +41,7 @@ A tiebreaker: a tied team scores +1 if it played every other team in the tied gr
 _Avoid_: Head-to-head record
 
 **Conference record**:
-A team's win percentage counting only games against opponents in its own conference. Compared directly across conferences, since each team is measured within its own. Independents have no conference record; rules that use it are skipped for any group containing one.
+A team's win percentage counting only games against opponents in its own conference. Compared directly across conferences, since each team is measured within its own. Independents have no conference record: for a group containing one, every team scores 0 and the rule falls through. A group containing a team with no conference games yet skips the rule.
 _Avoid_: League record
 
 **Common games**:
@@ -57,7 +57,7 @@ A tiebreaker: the combined win percentage of all FBS opponents a team played, as
 _Avoid_: Schedule difficulty
 
 **Combined ranking**:
-For each tied team, its rank in points scored (FBS opponents only) plus its rank in points allowed; the lower sum wins. Tied values share a rank (1, 2, 2, 4). Computed once among the teams of the tied team's own conference (so it compares across conferences), and once among all FBS teams. The conference version is skipped for any group containing a team with no conference.
+For each tied team, its rank in points scored (FBS opponents only) plus its rank in points allowed; the lower sum wins. Tied values share a rank (1, 2, 2, 4). Computed once among the teams of the tied team's own conference (so it compares across conferences), and once among all FBS teams. For a group containing a team with no conference, every team scores 0 and the rule falls through.
 _Avoid_: Composite rank
 
 **Net touchdowns**:
