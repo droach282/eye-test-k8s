@@ -8,3 +8,4 @@
 
 - [ ] Response names the compared poll and its week
 - [ ] Playoff field shows seeds, qualifying rule, byes and opening-round pairings
+- [ ] Any stored snapshot returns a playoff field, whatever its week

@@ -8,3 +8,4 @@
 
 - [ ] Handles snapshots with no compared poll
 - [ ] Loading, empty and error states
+- [ ] The field is presented as a projection (what the bracket would be if the season ended today), not as a result

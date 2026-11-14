@@ -187,7 +187,7 @@ A run asks for a **requested poll**, by default the Playoff Committee Rankings, 
 
 ## 9. Playoff field
 
-The field is built from the final ranking (disqualified teams already removed), best team first. The format comes from the season year: **12 teams** through 2026, **24 teams** from 2027.
+The field is a projection: what the field would be if the season ended with the games played so far. It is built from a snapshot's ranking (disqualified teams already removed), best team first, so it is computed for every snapshot, every week and every `k`, not only at the end of the season. The format comes from the season year: **12 teams** through 2026, **24 teams** from 2027.
 
 A conference's code identifies its group. The **Power Four** are `ACC`, `B12`, `B1G`, `SEC`. The **Group of Six** are `AAC`, `CUSA`, `MAC`, `MWC`, `PAC`, `SBC`. Notre Dame is identified by the school name "Notre Dame".
 

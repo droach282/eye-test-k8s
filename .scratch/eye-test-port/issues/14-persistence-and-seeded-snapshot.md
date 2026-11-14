@@ -11,6 +11,7 @@
 - [ ] Every compute adds a new snapshot; none is updated
 - [ ] Sample season has fictional teams in two conferences plus an independent, an FCS upset and a deep tiebreak
 - [ ] Sample reuses the synthetic fixtures where possible and needs no CFBD key
+- [ ] Every snapshot stores its own playoff field
 
 ## Comments
 
