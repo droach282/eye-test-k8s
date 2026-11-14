@@ -27,7 +27,7 @@ A team's schedule for a season: each game, its result, the opponent, and what th
 _Avoid_: Performance against the resume
 
 **Disqualified team**:
-A team that lost to any non-FBS opponent. It is excluded from the final ranking for the rest of the season, so it has no rank in a snapshot, but its games still count as results when scoring other teams. An FBS team is expected to beat any FCS team, which is also why FCS games are not counted in win percentage.
+A team that lost to any non-FBS opponent. It is excluded from the final ranking for the rest of the season, so it has no rank in a snapshot and is never in a tied group or the playoff field, but it still counts everywhere else: its games count as results when scoring other teams, and it is in the pools for the combined rankings. An FBS team is expected to beat any FCS team, which is also why FCS games are not counted in win percentage.
 _Avoid_: Ineligible team, banned team
 
 ### Tiebreaking

@@ -61,7 +61,7 @@ With `k = 0` every win is worth 1 and the win score is the win percentage (the *
 
 ## 4. Initial ordering and tied groups
 
-Only FBS teams are ranked. Each FBS team's win score is computed and the teams are ordered highest first, with a team whose win score is null after all others. (The result does not depend on the order teams are listed in the input.)
+Only FBS teams that are not disqualified (section 7) are ranked. Each such team's win score is computed and the teams are ordered highest first, with a team whose win score is null after all others. (The result does not depend on the order teams are listed in the input.)
 
 Teams are then grouped by **exactly equal win score**. Groups are processed in descending score order, and each group occupies the next block of rank positions:
 
@@ -179,7 +179,7 @@ Teams are sorted by code, ascending, by plain string comparison (so uppercase be
 
 An FBS team with a loss (`us < them`) to a non-FBS opponent is **disqualified**. If it has several, the one with the worst margin (the most negative net points) is the one reported.
 
-Disqualification happens **after** all ranking is done. A disqualified team is ranked and tiebroken like any other (so it can win a tiebreak over a team that is not disqualified), and its games count in every other team's win score, strength and rules. It is then removed from the ordered list, so every other team keeps its relative order. It has no rank in the final ranking and is listed separately with its non-FBS loss.
+A disqualified team is removed **before** ranking: it is never placed, never in a tied group and never seeded. It still counts everywhere else, exactly like any other FBS team: as an opponent in every other team's win score, strength of victories, strength of schedule, common games and head-to-head results, and in the pools for rules 6 and 7. It has no rank and is listed separately with its non-FBS loss. The Python ranks and tiebreaks a disqualified team and removes it afterwards; removing it first is a deliberate change by the owner, so that a disqualified team can never cause a tiebreaker to fall through.
 
 ## 8. Compared poll
 
@@ -228,10 +228,9 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 4 | A -1 sweep score never decides anything, because only the highest value counts | Rule 1 |
 | 5 | Rule 6 returns null when any team has no real conference | Rule 6 |
 | 6 | Teams with no FBS games have no win score, sort after all others and form one tied group | Section 4 |
-| 7 | Disqualified teams are ranked and tiebroken normally, then removed | Section 7 |
-| 8 | Seeds are positions among qualifiers, not ranks | Section 9 |
-| 9 | Rule 12 compares codes as plain strings, case-sensitively | Rule 12 |
-| 10 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
+| 7 | Seeds are positions among qualifiers, not ranks | Section 9 |
+| 8 | Rule 12 compares codes as plain strings, case-sensitively | Rule 12 |
+| 9 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
 
 ## Draft fixture list for the baseline gate
 
@@ -243,7 +242,7 @@ Each league is synthetic (ADR 0002) and runs at `k = 0` and at `k = 1`, with the
 | F02 | League where `k` changes the order | Quality weight |
 | F03 | A team with no FBS games | Null win score, last tied group |
 | F04 | A team that lost to an FCS team | Disqualification, others' order unchanged, worst margin |
-| F05 | A disqualified team that wins a tiebreak | Section 7 |
+| F05 | A disqualified team tied on win score with other teams | Section 7: not in the tied group, still counts in the others' rules |
 | F06 | An independent team in a tied group | Rules 2, 6 and 8 return null |
 | F07 | Head-to-head sweep decides | Rule 1 |
 | F08 | Head-to-head, not a round robin | Rule 1 falls through |
