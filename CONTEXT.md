@@ -36,6 +36,10 @@ _Avoid_: Ineligible team, banned team
 The set of teams with equal win score that the tiebreakers are trying to separate. Tiebreakers place one team at a time and restart for the rest, in the manner of the NFL wild-card procedure.
 _Avoid_: Logjam, tie bucket
 
+**Head-to-head sweep**:
+A tiebreaker: a tied team scores +1 if it played every other team in the tied group and beat all of them, -1 if it played them all and won none of them (a loss or a tie), and 0 otherwise. A group that is not a full round robin therefore usually scores 0 for everyone and falls through. Only the highest score counts, so a -1 never decides a placement.
+_Avoid_: Head-to-head record
+
 **Conference record**:
 A team's win percentage counting only games against opponents in its own conference. Compared directly across conferences, since each team is measured within its own. Independents have no conference record; rules that use it are skipped for any group containing one.
 _Avoid_: League record
