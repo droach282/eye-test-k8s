@@ -183,7 +183,7 @@ A disqualified team is removed **before** ranking: it is never placed, never in 
 
 ## 8. Compared poll
 
-A run asks for a **requested poll**, by default the Playoff Committee Rankings, for a **poll week** (by default the snapshot's week). If the requested poll has rankings for that week it is used; otherwise the AP Top 25's rankings for that week are used; otherwise there is no poll and every team is unranked. When polls are off, no poll is requested. If the response lists the same poll name more than once, the first entry listed is used, and a poll with an empty list of ranks counts as having no rankings. The Python requests rankings with no season type; requesting them under both season types is a deliberate change by the owner (ticket 18). The poll used, its name and its week are recorded with the result. See [CONTEXT.md](../CONTEXT.md) for **Compared poll** and **Poll week**.
+A run asks for a **requested poll**, by default the Playoff Committee Rankings, for a **poll week** (by default the snapshot's week). If the requested poll has rankings for that week it is used; otherwise the AP Top 25's rankings for that week are used; otherwise there is no poll and every team is unranked. When polls are off, no poll is requested. A poll with an empty list of ranks counts as having no rankings. Rankings are requested for the regular season only. The Python requests them with no season type, which CFBD answers with both: for week 1 that includes the postseason week 1 (the final polls after the bowls), so the same poll name appears twice and the Python uses whichever is listed first. Requesting the regular season only is a deliberate change by the owner; it gives the same result as the Python's current behavior without depending on the response order (ticket 18). The poll used, its name and its week are recorded with the result. See [CONTEXT.md](../CONTEXT.md) for **Compared poll** and **Poll week**.
 
 ## 9. Playoff field
 
@@ -230,7 +230,7 @@ These look accidental or surprising; each is recorded as a decision to port the 
 | 6 | Teams with no FBS games have no win score, sort after all others and form one tied group | Section 4 |
 | 7 | Seeds are positions among qualifiers, not ranks | Section 9 |
 | 8 | Rule 12 compares codes as plain strings, case-sensitively | Rule 12 |
-| 9 | When a poll response lists a poll name twice the first entry wins, and an empty list of ranks counts as no rankings | Section 8 |
+| 9 | An empty list of ranks counts as no rankings | Section 8 |
 
 ## Draft fixture list for the baseline gate
 
