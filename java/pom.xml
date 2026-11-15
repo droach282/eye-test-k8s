@@ -1,0 +1,13 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>eye-test-k8s</artifactId>
+    <groupId>com.grouchyhedgehog.eye-test-k8s</groupId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+<modules>
+    <module>api</module>
+    <module>engine</module>
+    <module>ingest</module>
+    <module>persistence</module>
+</modules>
+</project>

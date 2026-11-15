@@ -1,0 +1,16 @@
+<project>
+    <parent>
+        <groupId>com.grouchyhedgehog.eye-test-k8s</groupId>
+        <artifactId>eye-test-k8s</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>api</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <dependencies>
+        <dependency>
+            <groupId>com.grouchyhedgehog.eye-test-k8s</groupId>
+            <artifactId>engine</artifactId>
+            <version>1.0</version>
+        </dependency>
+    </dependencies>
+</project>
