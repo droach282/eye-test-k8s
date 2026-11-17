@@ -4,10 +4,49 @@
     <groupId>com.grouchyhedgehog.eye-test-k8s</groupId>
     <version>1.0</version>
     <packaging>pom</packaging>
-<modules>
-    <module>api</module>
-    <module>engine</module>
-    <module>ingest</module>
-    <module>persistence</module>
-</modules>
+    <modules>
+        <module>api</module>
+        <module>engine</module>
+        <module>ingest</module>
+        <module>persistence</module>
+    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>4.1.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.7.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>25</version>
+                                    <message>This'll only work with JDK 25 or newer.</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <properties>
+        <maven.compiler.release>25</maven.compiler.release>
+    </properties>
 </project>
