@@ -6,4 +6,35 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>engine</artifactId>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.7.0</version>
+                <executions>
+                    <execution>
+                        <id>ban-spring-and-others</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <excludes>
+                                        <exclude>org.springframework*</exclude>
+                                        <exclude>com.grouchyhedgehog.eye-test-k8s</exclude>
+                                        <exclude>org.postgresql*</exclude>
+                                        <exclude>org.hibernate.orm</exclude>
+                                        <exclude>org.flywaydb</exclude>
+                                        <exclude>jakarta.persistence</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
